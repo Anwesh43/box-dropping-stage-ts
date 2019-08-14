@@ -90,10 +90,11 @@ class BlockContainer {
 
     blocks : Array<Block> = []
 
-    start(x : number, y : number, cb : Function) {
+    start(x : number, y : number, addcb : Function, cb : Function) {
         const block = new Block(x, y)
         block.startUpdating(() => {
             this.blocks.push(block)
+            addcb(block.div)
             if (this.blocks.length == 1) {
                 console.log("starting call")
                 cb()
@@ -101,10 +102,11 @@ class BlockContainer {
         })
     }
 
-    update(cb : Function) {
+    update(removecb : Function, cb : Function) {
         this.blocks.forEach((block, index) => {
             block.update(() => {
                 this.blocks.splice(index, 1)
+                removecb(block.div)
                 if (this.blocks.length == 0) {
                     console.log("stopping call")
                     cb()
@@ -126,10 +128,26 @@ class Animator {
         }
     }
 
-    stop(cb : Function) {
+    stop() {
         if (this.animated) {
             this.animated = false
             clearInterval(this.interval)
         }
+    }
+}
+
+class Renderer {
+
+    animator : Animator = new Animator()
+    blockContainer : BlockContainer = new BlockContainer()
+
+    handleTap(x : number, y : number, addcb : Function, removecb : Function) {
+        this.blockContainer.start(x, y, addcb, () => {
+            this.animator.start(() => {
+                this.blockContainer.update(removecb, () => {
+                    this.animator.stop()
+                })
+            })
+        })
     }
 }
