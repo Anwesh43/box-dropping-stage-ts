@@ -8,6 +8,7 @@ const sizeFactor : number = 10
 class Stage {
 
     body : HTMLBodyElement
+    renderer : Renderer = new Renderer()
 
     init() {
         this.body = document.createElement('body')
@@ -15,8 +16,20 @@ class Stage {
         document.body.appendChild(this.body)
     }
 
-    add(component) {
-        this.body.appendChild(component)
+    handleTap() {
+        this.body.onclick = (event) => {
+            this.renderer.handleTap(event.offsetX, event.offsetY, (div) => {
+                this.body.appendChild(div)
+            }, (div) => {
+                this.body.removeChild(div)
+            })
+        }
+    }
+
+    static init() {
+        const stage : Stage = new Stage()
+        stage.init()
+        stage.handleTap()
     }
 }
 
