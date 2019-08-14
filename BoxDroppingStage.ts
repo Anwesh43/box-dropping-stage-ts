@@ -3,6 +3,7 @@ const h : number = window.innerHeight
 const scGap : number = 0.05
 const foreColor : string = "#f44336"
 const backColor : string = "#BDBDBD"
+const sizeFactor : number = 10
 
 class Stage {
 
@@ -56,5 +57,31 @@ class State {
             this.dir = 1 - 2 * this.prevScale
             cb()
         }
+    }
+}
+
+class Block {
+
+    div : HTMLDivElement = document.createElement('div')
+    state : State = new State()
+
+    constructor(private x : number, private y : number) {
+        this.div.style.position = 'absolute'
+        this.div.style.left = `${x}px`
+        this.div.style.top = `${y}px`
+    }
+
+    update(cb  : Function) {
+        const size : number = Math.min(w, h) / sizeFactor
+        const updatedSize : number = size * ScaleUtil.divideScale(this.state.scale, 0, 2)
+        this.div.style.width = `${updatedSize}px`
+        this.div.style.height = `${updatedSize}px`
+        const newY : number = this.y + (h - this.y) * ScaleUtil.divideScale(this.state.scale, 1, 2)
+        this.div.style.top = `${newY}px`
+        this.state.update(cb)
+    }
+
+    startUpdating(cb : Function) {
+        this.state.startUpdating(cb)
     }
 }
