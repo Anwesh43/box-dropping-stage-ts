@@ -43,8 +43,8 @@ class ScaleUtil {
         return Math.min(1 / n, ScaleUtil.maxScale(scale, i, n)) * n
     }
 
-    static updateScale(scale : number, dir : number) : number {
-        return dir * scale * scGap
+    static updateScale(dir : number) : number {
+        return dir  * scGap
     }
 }
 
@@ -56,7 +56,9 @@ class State {
     prevScale : number = 0
 
     update(cb : Function) {
-        this.scale += ScaleUtil.updateScale(this.scale, this.dir)
+        console.log(this.dir)
+        this.scale += ScaleUtil.updateScale(this.dir)
+        console.log(this.scale)
         if (Math.abs(this.scale - this.prevScale) > 1) {
             this.scale = this.prevScale + this.dir
             this.dir = 0
@@ -66,8 +68,9 @@ class State {
     }
 
     startUpdating(cb : Function) {
-        if (this.dir == 0 && this.scale == 0) {
+        if (this.dir == 0) {
             this.dir = 1 - 2 * this.prevScale
+            //console.log(this.dir)
             cb()
         }
     }
@@ -82,6 +85,7 @@ class Block {
         this.div.style.position = 'absolute'
         this.div.style.left = `${x}px`
         this.div.style.top = `${y}px`
+        this.div.style.background = foreColor
     }
 
     update(cb  : Function) {
@@ -105,6 +109,7 @@ class BlockContainer {
 
     start(x : number, y : number, addcb : Function, cb : Function) {
         const block = new Block(x, y)
+        console.log(block)
         block.startUpdating(() => {
             this.blocks.push(block)
             addcb(block.div)
