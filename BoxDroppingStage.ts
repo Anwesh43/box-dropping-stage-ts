@@ -53,7 +53,7 @@ class State {
     }
 
     startUpdating(cb : Function) {
-        if (this.dir == 0) {
+        if (this.dir == 0 && this.scale == 0) {
             this.dir = 1 - 2 * this.prevScale
             cb()
         }
@@ -84,4 +84,33 @@ class Block {
     startUpdating(cb : Function) {
         this.state.startUpdating(cb)
     }
+}
+
+class BlockContainer {
+
+    blocks : Array<Block> = []
+
+    start(x : number, y : number, cb : Function) {
+        const block = new Block(x, y)
+        block.startUpdating(() => {
+            this.blocks.push(block)
+            if (this.blocks.length == 1) {
+                console.log("starting call")
+                cb()
+            }
+        })
+    }
+
+    update(cb : Function) {
+        this.blocks.forEach((block, index) => {
+            block.update(() => {
+                this.blocks.splice(index, 1)
+                if (this.blocks.length == 0) {
+                    console.log("stopping call")
+                    cb()
+                }
+            })
+        })
+    }
+
 }
